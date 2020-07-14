@@ -26,7 +26,6 @@
     "copyfiles": "^1.2.0",
     "electron": "^2.0.x",
     "electron-builder": "^21.2.x",
-    "electron-rebuild": "1.8.x",
     "ncp": "^2.0.0"
   },
   "build": {
@@ -60,6 +59,7 @@
       "category": "Graphics"
     }
   },
+  "postinstall": "electron-builder install-app-deps",
   "keywords": [
     "laserweb",
     "cncweb",
