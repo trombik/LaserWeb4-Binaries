@@ -1,0 +1,211 @@
+---
+name: Release CI
+on:
+  - push
+  - pull_request
+
+jobs:
+  build:
+    runs-on: ${{ matrix.RUNNER_PLATFORM }}
+    strategy:
+      matrix:
+        version:
+          - linux-amd64
+          - linux-i386
+          - linux-aarch64
+          - macos-amd64
+          - windows-amd64
+            # XXX probably, 32 bit Windows is not so common, but built it
+            # anyway to see if the workflow has portability issues.
+          - windows-i386
+        include:
+          # XXX all of variables defined here are required. use empty string,
+          # "", or `${{ false }}` for BUILD_DEPEND if you do not need. GitHub
+          # Action will refuse to run the workflow if any of them are not
+          # defined.
+          #
+          # OS: used in many `if:` and in artifact names to identify artifact.
+          # ARCH: used in artifact names to identify artifact.
+          # RUNNER_PLATFORM: used in `runs-on:` to choose platform of the
+          # runner.
+          # ELECTRON_BUILDER_FLAGS: extra flags to pass when building code
+          # with electron-builder.
+          # BUILD_DEPEND: space-separated list of package names to install
+          # before the build
+          # BUILD_ARTIFACT_FILE_EXT: file extension of artifacts. files with
+          # this string at the end will be considered as artifacts.
+          # PKG_INSTALL_CMD: command to install BUILD_DEPEND
+          - version: linux-amd64
+            OS: linux
+            ARCH: amd64
+            RUNNER_PLATFORM: ubuntu-latest
+            ELECTRON_BUILDER_FLAGS: --linux --x64
+            BUILD_DEPEND: graphicsmagick xz-utils
+            BUILD_ARTIFACT_FILE_EXT: AppImage
+            PKG_INSTALL_CMD: sudo apt-get install
+          - version: linux-aarch64
+            OS: linux
+            ARCH: aarch64
+            RUNNER_PLATFORM: ubuntu-latest
+            ELECTRON_BUILDER_FLAGS: --linux --arm64
+            BUILD_DEPEND: graphicsmagick xz-utils
+            BUILD_ARTIFACT_FILE_EXT: AppImage
+            PKG_INSTALL_CMD: sudo apt-get install
+          - version: linux-i386
+            OS: linux
+            ARCH: i386
+            RUNNER_PLATFORM: ubuntu-latest
+            ELECTRON_BUILDER_FLAGS: --linux --ia32
+            BUILD_DEPEND: graphicsmagick xz-utils
+            BUILD_ARTIFACT_FILE_EXT: AppImage
+            PKG_INSTALL_CMD: sudo apt-get install
+          - version: macos-amd64
+            OS: macos
+            ARCH: amd64
+            RUNNER_PLATFORM: macos-latest
+            ELECTRON_BUILDER_FLAGS: --macos
+            BUILD_DEPEND: ${{ false }}
+            BUILD_ARTIFACT_FILE_EXT: dmg
+            PKG_INSTALL_CMD: brew install
+          - version: windows-i386
+            OS: windows
+            ARCH: i386
+            RUNNER_PLATFORM: windows-latest
+            ELECTRON_BUILDER_FLAGS: --windows --ia32
+            BUILD_DEPEND: ${{ false }}
+            BUILD_ARTIFACT_FILE_EXT: exe
+            PKG_INSTALL_CMD: ""
+          - version: windows-amd64
+            OS: windows
+            ARCH: amd64
+            RUNNER_PLATFORM: windows-latest
+            ELECTRON_BUILDER_FLAGS: --windows --x64
+            BUILD_DEPEND: ${{ false }}
+            BUILD_ARTIFACT_FILE_EXT: exe
+            PKG_INSTALL_CMD: ""
+        node-version:
+          # include 10.x only. serialport for 12.x is not available probably
+          # because it does not support 12.x.
+          #
+          # "No prebuilt binaries found (target=12.18.1 runtime=node arch=x64 platform=linux)'
+          - 10.x
+    steps:
+      - name: Install required packages
+        if: matrix.BUILD_DEPEND
+        run: ${{ matrix.PKG_INSTALL_CMD }} ${{ matrix.BUILD_DEPEND }}
+
+      - name: Checkout lw.comm-server
+        uses: actions/checkout@v2
+        with:
+          repository: trombik/lw.comm-server
+          path: lw.comm-server
+          ref: windows-build
+
+      - name: Checkout LaserWeb4
+        uses: actions/checkout@v2
+        with:
+          repository: trombik/LaserWeb4
+          path: LaserWeb4
+          ref: sync-package-json
+          # keep all history. other step needs commit logs.
+          fetch-depth: 0
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Get npm cache directory
+        id: npm-cache
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
+
+      - name: Cache npm
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.npm-cache.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Build LaserWeb4 (Unix)
+        if: matrix.OS != 'windows'
+        run: |
+          cd ${GITHUB_WORKSPACE}/LaserWeb4
+          npm ci
+          npm run installdev
+          npm run bundle-dev
+
+      - name: Build LaserWeb4 (Windows)
+        if: matrix.OS == 'windows'
+        shell: cmd
+        run: |
+          cd %GITHUB_WORKSPACE%\LaserWeb4
+          npm ci
+          npm run installdev
+          npm run bundle-dev
+
+      - name: Run npm ci in lw.comm-server (Unix)
+        if: matrix.OS != 'windows'
+        run: |
+          cd ${GITHUB_WORKSPACE}/lw.comm-server
+          npm ci
+
+      - name: Run npm ci in lw.comm-server (Windows)
+        if: matrix.OS == 'windows'
+        shell: cmd
+        run: |
+          cd %GITHUB_WORKSPACE%\lw.comm-server
+          npm ci
+
+      - name: Rebuild electron (Unix)
+        if: matrix.OS != 'windows'
+        run: |
+          cd ${GITHUB_WORKSPACE}/lw.comm-server
+          ./node_modules/.bin/electron-rebuild
+
+      - name: Rebuild electron (Windows)
+        if: matrix.OS == 'windows'
+        shell: cmd
+        run: |
+          cd %GITHUB_WORKSPACE%\lw.comm-server
+          .\node_modules\.bin\electron-rebuild
+
+      - name: Build (Unix)
+        if: matrix.OS != 'windows'
+        run: |
+          cd ${GITHUB_WORKSPACE}/LaserWeb4
+          # remove `v` from semver because Windows does not like string in
+          # version number.
+          UI_VERSION=$(git describe --abbrev=0 --tags | tr -d 'v')
+
+          cd ${GITHUB_WORKSPACE}/lw.comm-server
+          SERVER_VERSION=$(cat version.txt | cut -c 3-6)
+          ./node_modules/.bin/electron-builder build --config.buildVersion=$UI_VERSION -p never ${{ matrix.ELECTRON_BUILDER_FLAGS }}
+
+      - name: Build (Windows)
+        if: matrix.OS == 'windows'
+        shell: bash
+        run: |
+          cd ${GITHUB_WORKSPACE}\\LaserWeb4
+          # remove `v` from semver because Windows does not like string in
+          # version number.
+          UI_VERSION=$(git describe --abbrev=0 --tags | tr -d 'v')
+
+          cd ${GITHUB_WORKSPACE}\\lw.comm-server
+          SERVER_VERSION=$(cat version.txt | cut -c 3-6)
+          node_modules\\.bin\\electron-builder build --config.buildVersion=$UI_VERSION -p never ${{ matrix.ELECTRON_BUILDER_FLAGS }}
+
+      - name: Upload build artifact (Unix)
+        if: matrix.OS != 'windows'
+        uses: actions/upload-artifact@v2
+        with:
+          name: LaserWeb-${{ matrix.OS }}-${{ matrix.ARCH }}-${{ github.sha }}
+          path: ${{ github.workspace }}/lw.comm-server/dist/*.${{ matrix.BUILD_ARTIFACT_FILE_EXT }}
+
+      - name: Upload build artifact (Windows)
+        if: matrix.OS == 'windows'
+        uses: actions/upload-artifact@v2
+        with:
+          name: LaserWeb-${{ matrix.OS }}-${{ matrix.ARCH }}-${{ github.sha }}
+          path: ${{ github.workspace }}\lw.comm-server\dist\*.${{ matrix.BUILD_ARTIFACT_FILE_EXT }}
