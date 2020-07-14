@@ -138,7 +138,7 @@ jobs:
           # do not run `installdev` script because git submodules are
           # correctly handled in actions/checkout. the script also calls `npm
           # install`. which should not be used in CI.
-          node_modules/bin/webpack
+          node_modules/.bin/webpack
 
       - name: Build LaserWeb4 (Windows)
         if: matrix.OS == 'windows'
