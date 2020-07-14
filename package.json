@@ -19,7 +19,7 @@
   "homepage": "https://github.com/LaserWeb/LaserWeb-binaries#readme",
   "dependencies": {
     "electron-updater": "^2.21.10",
-    "lw.comm-server": "github:LaserWeb/lw.comm-server",
+    "lw.comm-server": "github:trombik/lw.comm-server#windows-build",
     "ncp": "^2.0.0"
   },
   "devDependencies": {
