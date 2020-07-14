@@ -106,6 +106,7 @@ jobs:
         with:
           repository: trombik/LaserWeb4
           path: LaserWeb4
+          submodules: recursive
           ref: sync-package-json
           # keep all history. other step needs commit logs.
           fetch-depth: 0
