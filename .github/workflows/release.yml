@@ -11,8 +11,6 @@ jobs:
       matrix:
         version:
           - linux-amd64
-          - linux-i386
-          - linux-aarch64
           - macos-amd64
           - windows-amd64
             # XXX probably, 32 bit Windows is not so common, but built it
@@ -40,22 +38,6 @@ jobs:
             ARCH: amd64
             RUNNER_PLATFORM: ubuntu-latest
             ELECTRON_BUILDER_FLAGS: --linux --x64
-            BUILD_DEPEND: graphicsmagick xz-utils
-            BUILD_ARTIFACT_FILE_EXT: AppImage
-            PKG_INSTALL_CMD: sudo apt-get install
-          - version: linux-aarch64
-            OS: linux
-            ARCH: aarch64
-            RUNNER_PLATFORM: ubuntu-latest
-            ELECTRON_BUILDER_FLAGS: --linux --arm64
-            BUILD_DEPEND: graphicsmagick xz-utils
-            BUILD_ARTIFACT_FILE_EXT: AppImage
-            PKG_INSTALL_CMD: sudo apt-get install
-          - version: linux-i386
-            OS: linux
-            ARCH: i386
-            RUNNER_PLATFORM: ubuntu-latest
-            ELECTRON_BUILDER_FLAGS: --linux --ia32
             BUILD_DEPEND: graphicsmagick xz-utils
             BUILD_ARTIFACT_FILE_EXT: AppImage
             PKG_INSTALL_CMD: sudo apt-get install
