@@ -132,8 +132,12 @@ jobs:
         if: matrix.OS != 'windows'
         run: |
           cd ${GITHUB_WORKSPACE}/LaserWeb4
+          # always use `npm ci`. `npm install` overwrites package-lock.json`,
+          # which defeats the purpose of CI.
           npm ci
-          npm run installdev
+          # do not run `installdev` script because git submodules are
+          # correctly handled in actions/checkout. the script also calls `npm
+          # install`. which should not be used in CI.
           npm run bundle-dev
 
       - name: Build LaserWeb4 (Windows)
@@ -141,8 +145,12 @@ jobs:
         shell: cmd
         run: |
           cd %GITHUB_WORKSPACE%\LaserWeb4
+          # always use `npm ci`. `npm install` overwrites package-lock.json`,
+          # which defeats the purpose of CI.
           npm ci
-          npm run installdev
+          # do not run `installdev` script because git submodules are
+          # correctly handled in actions/checkout. the script also calls `npm
+          # install`. which should not be used in CI.
           npm run bundle-dev
 
       - name: Run npm ci in lw.comm-server (Unix)
