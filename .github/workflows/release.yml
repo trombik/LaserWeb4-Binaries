@@ -94,6 +94,12 @@ jobs:
         if: matrix.BUILD_DEPEND
         run: ${{ matrix.PKG_INSTALL_CMD }} ${{ matrix.BUILD_DEPEND }}
 
+      - name: Install snapcraft (Linux)
+        # XXX electron-builder build fails when snapcraft is not installed
+        # "snapcraft is not installed, please: sudo snap install snapcraft --classic'
+        if: matrix.OS == 'linux'
+        run: sudo snap install snapcraft --classic
+
       - name: Checkout lw.comm-server
         uses: actions/checkout@v2
         with:
