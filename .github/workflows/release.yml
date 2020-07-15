@@ -14,6 +14,7 @@ jobs:
       matrix:
         version:
           - linux-amd64
+          - ubuntu-amd64
           - macos-amd64
           - windows-amd64
             # XXX probably, 32 bit Windows is not so common, but built it
@@ -38,7 +39,14 @@ jobs:
             OS: linux
             ARCH: amd64
             RUNNER_PLATFORM: ubuntu-latest
-            ELECTRON_BUILDER_FLAGS: --linux AppImage snap deb rpm tar.gz --x64
+            ELECTRON_BUILDER_FLAGS: --linux AppImage --x64
+            BUILD_DEPEND: graphicsmagick xz-utils
+            PKG_INSTALL_CMD: sudo apt-get install
+          - version: ubuntu-amd64
+            OS: ubuntu
+            ARCH: amd64
+            RUNNER_PLATFORM: ubuntu-latest
+            ELECTRON_BUILDER_FLAGS: --linux deb --x64
             BUILD_DEPEND: graphicsmagick xz-utils
             PKG_INSTALL_CMD: sudo apt-get install
           - version: macos-amd64
@@ -247,6 +255,10 @@ jobs:
             OS: windows
             ARCH: i386
             ARTIFACT_EXT: exe
+          - version: ubuntu-amd64
+            OS: ubuntu
+            ARCH: amd64
+            ARTIFACT_EXT: deb
     steps:
     - name: Get the version (git tag)
       id: get_version
