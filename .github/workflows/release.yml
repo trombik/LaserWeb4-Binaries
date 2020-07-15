@@ -152,6 +152,8 @@ jobs:
         shell: bash
         run: |
           cd ${GITHUB_WORKSPACE}/LaserWeb4-Binaries
+          yarn
+
           # remove `v` from semver because Windows does not like string in
           # version number.
           UI_VERSION=$(git describe --abbrev=0 --tags | tr -d 'v')
@@ -159,7 +161,6 @@ jobs:
           echo "UI_VERSION: ${UI_VERSION}"
           echo "SERVER_VERSION: ${SERVER_VERSION}"
 
-          yarn
           rm -rf ./node_modules/lw.comm-server/app
           cp -Rf ${GITHUB_WORKSPACE}/LaserWeb4/dist ./node_modules/lw.comm-server/app/
           ./node_modules/.bin/electron-builder build --config.buildVersion=$UI_VERSION -p never ${{ matrix.ELECTRON_BUILDER_FLAGS }}
@@ -169,6 +170,8 @@ jobs:
         shell: bash
         run: |
           cd ${GITHUB_WORKSPACE}\\LaserWeb4-Binaries
+          yarn
+
           # remove `v` from semver because Windows does not like string in
           # version number.
           UI_VERSION=$(git describe --abbrev=0 --tags | tr -d 'v')
@@ -176,7 +179,6 @@ jobs:
           echo "UI_VERSION: ${UI_VERSION}"
           echo "SERVER_VERSION: ${SERVER_VERSION}"
 
-          yarn
           rm -rf node_modules\\lw.comm-server\\app
           cp -Rf ${GITHUB_WORKSPACE}\\LaserWeb4\\dist node_modules\\lw.comm-server\\app\\
           node_modules\\.bin\\electron-builder build --config.buildVersion=$UI_VERSION -p never ${{ matrix.ELECTRON_BUILDER_FLAGS }}
