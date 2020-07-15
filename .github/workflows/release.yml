@@ -207,21 +207,17 @@ jobs:
 
       - name: Build LaserWeb4-Binaries (Unix)
         if: matrix.OS != 'windows'
+        shell: bash
         run: |
-          cd ${GITHUB_WORKSPACE}/LaserWeb4
+          cd ${GITHUB_WORKSPACE}/LaserWeb4-Binaries
           # remove `v` from semver because Windows does not like string in
           # version number.
           UI_VERSION=$(git describe --abbrev=0 --tags | tr -d 'v')
-
-          cd ${GITHUB_WORKSPACE}/lw.comm-server
-          SERVER_VERSION=$(cat version.txt | cut -c 3-6)
-
-          cd ${GITHUB_WORKSPACE}/LaserWeb4-Binaries
-          yarn
-
+          SERVER_VERSION=$(cat ./node_modules/lw.comm-server/version.txt | cut -c 3-6)
           echo "UI_VERSION: ${UI_VERSION}"
           echo "SERVER_VERSION: ${SERVER_VERSION}"
 
+          yarn
           rm -rf ./node_modules/lw.comm-server/app
           cp -Rf ${GITHUB_WORKSPACE}/LaserWeb4/dist ./node_modules/lw.comm-server/app/
           ./node_modules/.bin/electron-builder build --config.buildVersion=$UI_VERSION -p never ${{ matrix.ELECTRON_BUILDER_FLAGS }}
@@ -230,20 +226,15 @@ jobs:
         if: matrix.OS == 'windows'
         shell: bash
         run: |
-          cd ${GITHUB_WORKSPACE}\\LaserWeb4
+          cd ${GITHUB_WORKSPACE}\\LaserWeb4-Binaries
           # remove `v` from semver because Windows does not like string in
           # version number.
           UI_VERSION=$(git describe --abbrev=0 --tags | tr -d 'v')
-
-          cd ${GITHUB_WORKSPACE}\\lw.comm-server
-          SERVER_VERSION=$(cat version.txt | cut -c 3-6)
-
-          cd ${GITHUB_WORKSPACE}\\LaserWeb4-Binaries
-          yarn
-
+          SERVER_VERSION=$(cat ./node_modules/lw.comm-server/version.txt | cut -c 3-6)
           echo "UI_VERSION: ${UI_VERSION}"
           echo "SERVER_VERSION: ${SERVER_VERSION}"
 
+          yarn
           rm -rf node_modules\\lw.comm-server\\app
           cp -Rf ${GITHUB_WORKSPACE}\\LaserWeb4\\dist node_modules\\lw.comm-server\\app\\
           node_modules\\.bin\\electron-builder build --config.buildVersion=$UI_VERSION -p never ${{ matrix.ELECTRON_BUILDER_FLAGS }}
