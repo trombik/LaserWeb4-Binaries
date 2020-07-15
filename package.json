@@ -11,7 +11,10 @@
     "type": "git",
     "url": "git+https://github.com/Laserweb/LaserWeb-binaries.git"
   },
-  "author": "",
+  "author": {
+    "name": "Nobody",
+    "email": "nobody@laserweb.yurl.ch"
+  },
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/LaserWeb/LaserWeb-binaries/issues"
