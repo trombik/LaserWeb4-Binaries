@@ -12,7 +12,7 @@
     "prep": "yarn prep-work && yarn prep-LaserWeb4 && yarn update-LaserWeb4",
     "bundle-LaserWeb4": "shx cp -r work/LaserWeb4/dist ./node_modules/lw.comm-server/app/",
     "bundle": "yarn bundle-LaserWeb4",
-    "build-LaserWeb4": "cd work && cd LaserWeb4 && shx node_modules/.bin/webpack",
+    "build-LaserWeb4": "cd work && cd LaserWeb4 && cross-env node_modules/.bin/webpack",
     "build": "yarn build-LaserWeb4 && yarn bundle-LaserWeb4 && electron-builder",
     "clean": "shx rm -rf work",
     "pack": "electron-builder --dir",
@@ -37,6 +37,7 @@
     "ncp": "^2.0.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.2",
     "copyfiles": "^1.2.0",
     "electron": "^2.0.x",
     "electron-builder": "^21.2.x",
