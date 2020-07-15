@@ -90,6 +90,9 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: LaserWeb4-Binaries
+          # keep all history. `git describe` is used in the build to get
+          # version string
+          fetch-depth: 0
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
