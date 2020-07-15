@@ -1,7 +1,7 @@
 {
   "name": "laserweb-builder",
   "version": "1.0.0",
-  "description": "",
+  "description": "Open-source laser cutter and engraver software",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
