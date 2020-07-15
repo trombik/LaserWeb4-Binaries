@@ -163,14 +163,14 @@ jobs:
         with:
           name: LaserWeb-${{ matrix.OS }}-${{ matrix.ARCH }}-${{ github.sha }}
           path: |
-            ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.AppImage
-            ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.snap
-            ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.zip
-            ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.dmg
-            ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.exe
-            ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.rpm
-            ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.deb
-            ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.tar.gz
+            ${{ github.workspace }}/dist/*.AppImage
+            ${{ github.workspace }}/dist/*.snap
+            ${{ github.workspace }}/dist/*.zip
+            ${{ github.workspace }}/dist/*.dmg
+            ${{ github.workspace }}/dist/*.exe
+            ${{ github.workspace }}/dist/*.rpm
+            ${{ github.workspace }}/dist/*.deb
+            ${{ github.workspace }}/dist/*.tar.gz
 
       - name: Upload build artifact (Windows)
         if: matrix.OS == 'windows'
@@ -178,11 +178,11 @@ jobs:
         with:
           name: LaserWeb-${{ matrix.OS }}-${{ matrix.ARCH }}-${{ github.sha }}
           path: |
-            ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.AppImage
-            ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.snap
-            ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.zip
-            ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.dmg
-            ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.exe
-            ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.rpm
-            ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.deb
-            ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.tar.gz
+            ${{ github.workspace }}\\dist\\*.AppImage
+            ${{ github.workspace }}\\dist\\*.snap
+            ${{ github.workspace }}\\dist\\*.zip
+            ${{ github.workspace }}\\dist\\*.dmg
+            ${{ github.workspace }}\\dist\\*.exe
+            ${{ github.workspace }}\\dist\\*.rpm
+            ${{ github.workspace }}\\dist\\*.deb
+            ${{ github.workspace }}\\dist\\*.tar.gz
