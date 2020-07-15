@@ -76,20 +76,9 @@ jobs:
         if: matrix.OS == 'linux'
         run: sudo snap install snapcraft --classic
 
-      - name: Checkout LaserWeb4
-        uses: actions/checkout@v2
-        with:
-          repository: trombik/LaserWeb4
-          path: LaserWeb4
-          submodules: recursive
-          ref: sync-package-json
-          # keep all history. other step needs commit logs.
-          fetch-depth: 0
-
       - name: Checkout LaserWeb4-Binaries
         uses: actions/checkout@v2
         with:
-          path: LaserWeb4-Binaries
           # keep all history. `git describe` is used in the build to get
           # version string
           fetch-depth: 0
@@ -125,67 +114,38 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Build LaserWeb4 (Unix)
-        if: matrix.OS != 'windows'
+      - name: Prepare
         run: |
-          cd ${GITHUB_WORKSPACE}/LaserWeb4
-          # always use `npm ci`. `npm install` overwrites package-lock.json`,
-          # which defeats the purpose of CI.
-          npm ci
-          # do not run `installdev` script because git submodules are
-          # correctly handled in actions/checkout. the script also calls `npm
-          # install`. which should not be used in CI.
-          node_modules/.bin/webpack
+          yarn install --frozen-lockfile
+          yarn prep
 
-      - name: Build LaserWeb4 (Windows)
-        if: matrix.OS == 'windows'
-        shell: cmd
+      - name: Build LaserWeb4
         run: |
-          cd %GITHUB_WORKSPACE%\LaserWeb4
-          # always use `npm ci`. `npm install` overwrites package-lock.json`,
-          # which defeats the purpose of CI.
-          npm ci
-          # do not run `installdev` script because git submodules are
-          # correctly handled in actions/checkout. the script also calls `npm
-          # install`. which should not be used in CI.
-          .\node_modules\.bin\webpack
+          yarn build-LaserWeb4
 
-      - name: Build LaserWeb4-Binaries (Unix)
-        if: matrix.OS != 'windows'
+      - name: Build LaserWeb4-Binaries
         shell: bash
         run: |
+          yarn bundle-LaserWeb4
+
           cd ${GITHUB_WORKSPACE}/LaserWeb4-Binaries
-          yarn install --frozen-lockfile
 
           # remove `v` from semver because Windows does not like string in
           # version number.
           UI_VERSION=$(git describe --abbrev=0 --tags | tr -d 'v')
-          SERVER_VERSION=$(cat ./node_modules/lw.comm-server/version.txt | cut -c 3-6)
+
+          # avoid path separator for portability
+          cd node_modules
+          cd lw.comm-server
+          SERVER_VERSION=$(cat version.txt | cut -c 3-6)
+          cd ..
+          cd ..
           echo "UI_VERSION: ${UI_VERSION}"
           echo "SERVER_VERSION: ${SERVER_VERSION}"
 
-          rm -rf ./node_modules/lw.comm-server/app
-          cp -Rf ${GITHUB_WORKSPACE}/LaserWeb4/dist ./node_modules/lw.comm-server/app/
-
-          ./node_modules/.bin/electron-builder build --config.buildVersion=$UI_VERSION -p never ${{ matrix.ELECTRON_BUILDER_FLAGS }}
-
-      - name: Build LaserWeb4-Binaries (Windows)
-        if: matrix.OS == 'windows'
-        shell: bash
-        run: |
-          cd ${GITHUB_WORKSPACE}\\LaserWeb4-Binaries
-          yarn install --frozen-lockfile
-
-          # remove `v` from semver because Windows does not like string in
-          # version number.
-          UI_VERSION=$(git describe --abbrev=0 --tags | tr -d 'v')
-          SERVER_VERSION=$(cat ./node_modules/lw.comm-server/version.txt | cut -c 3-6)
-          echo "UI_VERSION: ${UI_VERSION}"
-          echo "SERVER_VERSION: ${SERVER_VERSION}"
-
-          rm -rf node_modules\\lw.comm-server\\app
-          cp -Rf ${GITHUB_WORKSPACE}\\LaserWeb4\\dist node_modules\\lw.comm-server\\app\\
-          node_modules\\.bin\\electron-builder build --config.buildVersion=$UI_VERSION -p never ${{ matrix.ELECTRON_BUILDER_FLAGS }}
+          cd node_modules
+          cd .bin
+          electron-builder build --config.buildVersion=$UI_VERSION -p never ${{ matrix.ELECTRON_BUILDER_FLAGS }}
 
       - name: Upload build artifact (Unix)
         if: matrix.OS != 'windows'
