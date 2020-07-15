@@ -234,15 +234,19 @@ jobs:
           - version: linux-amd64
             OS: linux
             ARCH: amd64
+            ARTIFACT_EXT: AppImage
           - version: macos-amd64
             OS: macos
             ARCH: amd64
+            ARTIFACT_EXT: dmg
           - version: windows-amd64
             OS: windows
             ARCH: amd64
+            ARTIFACT_EXT: exe
           - version: windows-i386
             OS: windows
             ARCH: i386
+            ARTIFACT_EXT: exe
     steps:
     - name: Get the version (git tag)
       id: get_version
@@ -255,11 +259,22 @@ jobs:
         name: LaserWeb-${{ matrix.OS }}-${{ matrix.ARCH }}-${{ github.sha }}
     # rename the retrieved intermediary artifact and prepare zip file
     - name: Prepare release artifact
+      id: relese-file
       env:
         VERSION: ${{ steps.get_version.outputs.VERSION }}
       run: |
-        mv ./LaserWeb-${{ matrix.OS }}-${{ matrix.ARCH }}-${{ github.sha }}/* .
-        zip -j LaserWeb-$VERSION-${{ matrix.OS }}-${{ matrix.ARCH }}.zip ./*
+        FILE_NAME=LaserWeb-${{ matrix.OS }}-${{ matrix.ARCH }}-${{ steps.get_version.outputs.VERSION }}.${{ matrix.ARTIFACT_EXT }}
+        case ${{ matrix.ARTIFACT_EXT }} in
+        dmg)
+          MIME_TYPE="application/x-apple-diskimage"
+          ;;
+        *)
+          MIME_TYPE="application/octet-stream"
+          ;;
+        esac
+        mv ./LaserWeb-${{ matrix.OS }}-${{ matrix.ARCH }}-${{ github.sha }}/*.${{ matrix.ARTIFACT_EXT }} ${FILE_NAME}
+        echo ::set-output name=FILENAME::${FILENAME}
+        echo ::set-output name=MIME_TYPE::${MIME_TYPE}
     # Download the previously uploaded artifact which contains the release URL
     - name: Retrieve stashed release URL
       uses: actions/download-artifact@v1
@@ -269,15 +284,6 @@ jobs:
     - name: Read release URL
       id: get_release_url
       run: echo ::set-output name=URL::$(cat release-url/url.txt)
-    # This step is only needed because the upload-release-asset currently doesn't support
-    # environment variables. Therefore they must be written and referenced through step.outputs
-    - name: Prepare artifact metadata
-      id: prepare_artifact_metadata
-      env:
-        VERSION: ${{ steps.get_version.outputs.VERSION }}
-      run: |
-        echo ::set-output name=ARTIFACT_PATH::./LaserWeb-$VERSION-${{ matrix.OS }}-${{ matrix.ARCH }}.zip
-        echo ::set-output name=ARTIFACT_NAME::LaserWeb-$VERSION-${{ matrix.OS }}-${{ matrix.ARCH }}.zip
     # Finally upload the artifact to the corresponding release
     - name: Upload Release Artifact ${{ matrix.version }}
       uses: actions/upload-release-asset@v1.0.1
@@ -285,6 +291,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.get_release_url.outputs.URL }}
-        asset_path: ${{ steps.prepare_artifact_metadata.outputs.ARTIFACT_PATH }}
-        asset_name: ${{ steps.prepare_artifact_metadata.outputs.ARTIFACT_NAME }}
-        asset_content_type: application/gzip
+        asset_path: ./${{ steps.relese-file.outputs.FILENAME }}
+        asset_name: ${{ steps.relese-file.outputs.FILENAME }}
+        asset_content_type: ${{ steps.relese-file.outputs.MIME_TYPE }}
