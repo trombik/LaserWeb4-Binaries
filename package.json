@@ -6,13 +6,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
     "start": "./node_modules/.bin/electron .",
-    "prep-LaserWeb4": "if [ ! -d work ]; then mkdir -p work && git clone -b sync-package-json https://github.com/trombik/LaserWeb4 work/LaserWeb4 && (cd work/LaserWeb4 && git submodule update --init --recursive && npm ci); fi",
-    "prep": "yarn prep-LaserWeb4",
-    "bundle-LaserWeb4": "cp -r work/LaserWeb4/dist ./node_modules/lw.comm-server/app/",
+    "prep-work": "shx mkdir -p work",
+    "prep-LaserWeb4": "shx git clone -b sync-package-json https://github.com/trombik/LaserWeb4 work/LaserWeb4",
+    "update-LaserWeb4": "cd work && cd LaserWeb4 && git submodule update --init --recursive && npm ci",
+    "prep": "yarn prep-work && yarn prep-LaserWeb4 && yarn update-LaserWeb4",
+    "bundle-LaserWeb4": "shx cp -r work/LaserWeb4/dist ./node_modules/lw.comm-server/app/",
     "bundle": "yarn bundle-LaserWeb4",
-    "build-LaserWeb4": "(cd work/LaserWeb4 && node_modules/.bin/webpack)",
+    "build-LaserWeb4": "cd work && cd LaserWeb4 && shx node_modules/.bin/webpack",
     "build": "yarn build-LaserWeb4 && yarn bundle-LaserWeb4 && electron-builder",
-    "clean": "rm -rf work",
+    "clean": "shx rm -rf work",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },
@@ -38,7 +40,8 @@
     "copyfiles": "^1.2.0",
     "electron": "^2.0.x",
     "electron-builder": "^21.2.x",
-    "ncp": "^2.0.0"
+    "ncp": "^2.0.0",
+    "shx": "^0.3.2"
   },
   "build": {
     "appId": "xyz.laserweb",
