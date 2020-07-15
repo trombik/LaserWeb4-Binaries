@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
     "start": "./node_modules/.bin/electron .",
-    "prepare-LaserWeb4": "if [ ! -d work ]; then mkdir -p work && git clone -b sync-package-json https://github.com/trombik/LaserWeb4 work/LaserWeb4 && (cd work/LaserWeb4 && git submodule update --init --recursive && npm ci); fi",
-    "prepare": "yarn prep-LaserWeb4",
+    "prep-LaserWeb4": "if [ ! -d work ]; then mkdir -p work && git clone -b sync-package-json https://github.com/trombik/LaserWeb4 work/LaserWeb4 && (cd work/LaserWeb4 && git submodule update --init --recursive && npm ci); fi",
+    "prep": "yarn prep-LaserWeb4",
     "bundle-LaserWeb4": "cp -r work/LaserWeb4/dist ./node_modules/lw.comm-server/app/",
     "bundle": "yarn bundle-LaserWeb4",
     "build-LaserWeb4": "(cd work/LaserWeb4 && node_modules/.bin/webpack)",

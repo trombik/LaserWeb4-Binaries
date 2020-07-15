@@ -155,7 +155,7 @@ jobs:
         shell: bash
         run: |
           cd ${GITHUB_WORKSPACE}/LaserWeb4-Binaries
-          yarn
+          yarn install --frozen-lockfile
 
           # remove `v` from semver because Windows does not like string in
           # version number.
@@ -174,7 +174,7 @@ jobs:
         shell: bash
         run: |
           cd ${GITHUB_WORKSPACE}\\LaserWeb4-Binaries
-          yarn
+          yarn install --frozen-lockfile
 
           # remove `v` from semver because Windows does not like string in
           # version number.
