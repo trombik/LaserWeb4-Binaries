@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 0",
     "start": "./node_modules/.bin/electron .",
     "prep-work": "shx mkdir -p work",
-    "prep-LaserWeb4": "shx git clone -b sync-package-json https://github.com/trombik/LaserWeb4 work/LaserWeb4",
+    "prep-LaserWeb4": "cd work && git clone -b sync-package-json https://github.com/trombik/LaserWeb4",
     "update-LaserWeb4": "cd work && cd LaserWeb4 && git submodule update --init --recursive && npm ci",
     "prep": "yarn prep-work && yarn prep-LaserWeb4 && yarn update-LaserWeb4",
     "bundle-LaserWeb4": "shx cp -r work/LaserWeb4/dist ./node_modules/lw.comm-server/app/",
