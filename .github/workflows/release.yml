@@ -166,6 +166,7 @@ jobs:
 
           rm -rf ./node_modules/lw.comm-server/app
           cp -Rf ${GITHUB_WORKSPACE}/LaserWeb4/dist ./node_modules/lw.comm-server/app/
+
           ./node_modules/.bin/electron-builder build --config.buildVersion=$UI_VERSION -p never ${{ matrix.ELECTRON_BUILDER_FLAGS }}
 
       - name: Build LaserWeb4-Binaries (Windows)
@@ -197,6 +198,9 @@ jobs:
             ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.zip
             ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.dmg
             ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.exe
+            ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.rpm
+            ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.deb
+            ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.tar.gz
 
       - name: Upload build artifact (Windows)
         if: matrix.OS == 'windows'
@@ -209,3 +213,6 @@ jobs:
             ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.zip
             ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.dmg
             ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.exe
+            ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.rpm
+            ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.deb
+            ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.tar.gz
