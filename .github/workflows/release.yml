@@ -35,7 +35,7 @@ jobs:
             OS: linux
             ARCH: amd64
             RUNNER_PLATFORM: ubuntu-latest
-            ELECTRON_BUILDER_FLAGS: --linux --x64
+            ELECTRON_BUILDER_FLAGS: --linux AppImage snap deb rpm tar.gz --x64
             BUILD_DEPEND: graphicsmagick xz-utils
             PKG_INSTALL_CMD: sudo apt-get install
           - version: macos-amd64
