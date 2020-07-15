@@ -123,11 +123,10 @@ jobs:
         run: |
           yarn build-LaserWeb4
 
-      - name: Build LaserWeb4-Binaries
+      - name: Obtain UI_VERSION
+        id: ui-version
         shell: bash
         run: |
-          yarn bundle-LaserWeb4
-
           # remove `v` from semver because Windows does not like string in
           # version number.
           UI_VERSION=$(git describe --abbrev=0 --tags | tr -d 'v')
@@ -140,10 +139,23 @@ jobs:
           cd ..
           echo "UI_VERSION: ${UI_VERSION}"
           echo "SERVER_VERSION: ${SERVER_VERSION}"
+          echo "::set-output name=version::${UI_VERSION}"
 
-          cd node_modules
-          cd .bin
-          ./electron-builder build --config.buildVersion=$UI_VERSION -p never ${{ matrix.ELECTRON_BUILDER_FLAGS }}
+      - name: Build LaserWeb4-Binaries (Unix)
+        if: matrix.OS != 'windows'
+        run: |
+          yarn bundle-LaserWeb4
+          # XXX duplicate the step here because you cannot pass environment
+          # variable to `scripts` in package.json.
+          ./node_modules/.bin/electron-builder build --config.buildVersion=${{ steps.ui-version.outputs.version }} -p never ${{ matrix.ELECTRON_BUILDER_FLAGS }}
+
+      - name: Build LaserWeb4-Binaries (Windows)
+        if: matrix.OS == 'windows'
+        run: |
+          yarn bundle-LaserWeb4
+          # XXX duplicate the step here because you cannot pass environment
+          # variable to `scripts` in package.json.
+          .\node_modules\.bin\electron-builder build --config.buildVersion=${{ steps.ui-version.outputs.version }} -p never ${{ matrix.ELECTRON_BUILDER_FLAGS }}
 
       - name: Upload build artifact (Unix)
         if: matrix.OS != 'windows'
