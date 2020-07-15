@@ -30,8 +30,6 @@ jobs:
           # with electron-builder.
           # BUILD_DEPEND: space-separated list of package names to install
           # before the build
-          # BUILD_ARTIFACT_FILE_EXT: file extension of artifacts. files with
-          # this string at the end will be considered as artifacts.
           # PKG_INSTALL_CMD: command to install BUILD_DEPEND
           - version: linux-amd64
             OS: linux
@@ -39,7 +37,6 @@ jobs:
             RUNNER_PLATFORM: ubuntu-latest
             ELECTRON_BUILDER_FLAGS: --linux --x64
             BUILD_DEPEND: graphicsmagick xz-utils
-            BUILD_ARTIFACT_FILE_EXT: AppImage
             PKG_INSTALL_CMD: sudo apt-get install
           - version: macos-amd64
             OS: macos
@@ -47,7 +44,6 @@ jobs:
             RUNNER_PLATFORM: macos-latest
             ELECTRON_BUILDER_FLAGS: --macos
             BUILD_DEPEND: ${{ false }}
-            BUILD_ARTIFACT_FILE_EXT: dmg
             PKG_INSTALL_CMD: brew install
           - version: windows-i386
             OS: windows
@@ -55,7 +51,6 @@ jobs:
             RUNNER_PLATFORM: windows-latest
             ELECTRON_BUILDER_FLAGS: --windows --ia32
             BUILD_DEPEND: ${{ false }}
-            BUILD_ARTIFACT_FILE_EXT: exe
             PKG_INSTALL_CMD: ""
           - version: windows-amd64
             OS: windows
@@ -63,7 +58,6 @@ jobs:
             RUNNER_PLATFORM: windows-latest
             ELECTRON_BUILDER_FLAGS: --windows --x64
             BUILD_DEPEND: ${{ false }}
-            BUILD_ARTIFACT_FILE_EXT: exe
             PKG_INSTALL_CMD: ""
         node-version:
           # include 10.x only. serialport for 12.x is not available probably
@@ -259,11 +253,21 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: LaserWeb-${{ matrix.OS }}-${{ matrix.ARCH }}-${{ github.sha }}
-          path: ${{ github.workspace }}/lw.comm-server/dist/*.${{ matrix.BUILD_ARTIFACT_FILE_EXT }}
+          path: |
+            ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.AppImage
+            ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.snap
+            ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.zip
+            ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.dmg
+            ${{ github.workspace }}/LaserWeb4-Binaries/dist/*.exe
 
       - name: Upload build artifact (Windows)
         if: matrix.OS == 'windows'
         uses: actions/upload-artifact@v2
         with:
           name: LaserWeb-${{ matrix.OS }}-${{ matrix.ARCH }}-${{ github.sha }}
-          path: ${{ github.workspace }}\lw.comm-server\dist\*.${{ matrix.BUILD_ARTIFACT_FILE_EXT }}
+          path: |
+            ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.AppImage
+            ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.snap
+            ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.zip
+            ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.dmg
+            ${{ github.workspace }}\\LaserWeb4-Binaries\\dist\\*.exe
