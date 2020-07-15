@@ -212,6 +212,9 @@ jobs:
           cd ${GITHUB_WORKSPACE}/LaserWeb4-Binaries
           npm ci
 
+          echo "UI_VERSION: ${UI_VERSION}"
+          echo "SERVER_VERSION: ${SERVER_VERSION}"
+
           rm -rf ./node_modules/lw.comm-server/app
           cp -Rf ${GITHUB_WORKSPACE}/LaserWeb4/dist ./node_modules/lw.comm-server/app/
           ./node_modules/.bin/electron-builder build --config.buildVersion=$UI_VERSION -p never ${{ matrix.ELECTRON_BUILDER_FLAGS }}
@@ -230,6 +233,9 @@ jobs:
 
           cd ${GITHUB_WORKSPACE}\\LaserWeb4-Binaries
           npm ci
+
+          echo "UI_VERSION: ${UI_VERSION}"
+          echo "SERVER_VERSION: ${SERVER_VERSION}"
 
           rm -rf node_modules\\lw.comm-server\\app
           cp -Rf ${GITHUB_WORKSPACE}\\LaserWeb4\\dist node_modules\\lw.comm-server\\app\\
