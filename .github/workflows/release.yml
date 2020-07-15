@@ -76,13 +76,6 @@ jobs:
         if: matrix.OS == 'linux'
         run: sudo snap install snapcraft --classic
 
-      - name: Checkout lw.comm-server
-        uses: actions/checkout@v2
-        with:
-          repository: trombik/lw.comm-server
-          path: lw.comm-server
-          ref: windows-build
-
       - name: Checkout LaserWeb4
         uses: actions/checkout@v2
         with:
@@ -153,57 +146,6 @@ jobs:
           # correctly handled in actions/checkout. the script also calls `npm
           # install`. which should not be used in CI.
           .\node_modules\.bin\webpack
-
-      - name: Run npm ci in lw.comm-server (Unix)
-        if: matrix.OS != 'windows'
-        run: |
-          cd ${GITHUB_WORKSPACE}/lw.comm-server
-          npm ci
-
-      - name: Run npm ci in lw.comm-server (Windows)
-        if: matrix.OS == 'windows'
-        shell: cmd
-        run: |
-          cd %GITHUB_WORKSPACE%\lw.comm-server
-          npm ci
-
-      - name: Rebuild electron (Unix)
-        if: matrix.OS != 'windows'
-        run: |
-          cd ${GITHUB_WORKSPACE}/lw.comm-server
-          ./node_modules/.bin/electron-rebuild
-
-      - name: Rebuild electron (Windows)
-        if: matrix.OS == 'windows'
-        shell: cmd
-        run: |
-          cd %GITHUB_WORKSPACE%\lw.comm-server
-          .\node_modules\.bin\electron-rebuild
-
-      - name: Build lw.comm-server (Unix)
-        if: matrix.OS != 'windows'
-        run: |
-          cd ${GITHUB_WORKSPACE}/LaserWeb4
-          # remove `v` from semver because Windows does not like string in
-          # version number.
-          UI_VERSION=$(git describe --abbrev=0 --tags | tr -d 'v')
-
-          cd ${GITHUB_WORKSPACE}/lw.comm-server
-          SERVER_VERSION=$(cat version.txt | cut -c 3-6)
-          ./node_modules/.bin/electron-builder build --config.buildVersion=$UI_VERSION -p never ${{ matrix.ELECTRON_BUILDER_FLAGS }}
-
-      - name: Build lw.comm-server (Windows)
-        if: matrix.OS == 'windows'
-        shell: bash
-        run: |
-          cd ${GITHUB_WORKSPACE}\\LaserWeb4
-          # remove `v` from semver because Windows does not like string in
-          # version number.
-          UI_VERSION=$(git describe --abbrev=0 --tags | tr -d 'v')
-
-          cd ${GITHUB_WORKSPACE}\\lw.comm-server
-          SERVER_VERSION=$(cat version.txt | cut -c 3-6)
-          node_modules\\.bin\\electron-builder build --config.buildVersion=$UI_VERSION -p never ${{ matrix.ELECTRON_BUILDER_FLAGS }}
 
       - name: Build LaserWeb4-Binaries (Unix)
         if: matrix.OS != 'windows'
