@@ -34,6 +34,7 @@
   "dependencies": {
     "electron-updater": "^4.0.0",
     "lw.comm-server": "github:trombik/lw.comm-server#windows-build",
+    "serialport": "^9.0.0",
     "ncp": "^2.0.0"
   },
   "devDependencies": {
