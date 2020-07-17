@@ -14,16 +14,10 @@ const electronApp = electron.app;
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow = null;
 
-const shouldQuit = electronApp.makeSingleInstance((commandLine, workingDirectory) => {
-  // Someone tried to run a second instance, we should focus our window.
-  if (mainWindow) {
-    if (mainWindow.isMinimized()) mainWindow.restore();
-    mainWindow.focus();
-  }
-});
+const gotlock = electronApp.requestSingleInstanceLock();
 
-if (shouldQuit) {
-  electronApp.quit();
+if (!gotlock) {
+   electronApp.quit();
 }
 
 // Create myWindow, load the rest of the app, etc...
@@ -33,7 +27,7 @@ if (electronApp) {
 
     function createWindow() {
         // Create the browser window.
-        mainWindow = new BrowserWindow({width: 1200, height: 900, fullscreen: false, center: true, resizable: true, title: "LaserWeb", frame: true, autoHideMenuBar: true, icon: '/public/favicon.png' });
+        mainWindow = new BrowserWindow({width: 1200, height: 900, fullscreen: false, center: true, resizable: true, title: "LaserWeb", frame: true, autoHideMenuBar: false });
 
         // and load the index.html of the app.
         mainWindow.loadURL('http://127.0.0.1:' + config.webPort);
