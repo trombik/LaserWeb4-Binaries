@@ -33,15 +33,16 @@
   "homepage": "https://github.com/LaserWeb/LaserWeb-binaries#readme",
   "dependencies": {
     "electron-updater": "^4.0.0",
-    "lw.comm-server": "github:trombik/lw.comm-server#windows-build",
-    "serialport": "^9.0.0",
-    "ncp": "^2.0.0"
+    "lw.comm-server": "github:trombik/lw.comm-server#557de0f6d49e5ba658db1f003132212e7d598cde",
+    "ncp": "^2.0.0",
+    "serialport": "^9.0.0"
   },
   "devDependencies": {
-    "cross-env": "^7.0.2",
     "copyfiles": "^1.2.0",
-    "electron": "^2.0.x",
+    "cross-env": "^7.0.2",
+    "electron": "^9.0.x",
     "electron-builder": "^21.2.x",
+    "electron-rebuild": "^1.11.0",
     "ncp": "^2.0.0",
     "shx": "^0.3.2"
   },
